@@ -11,7 +11,31 @@ import GuestForm from "~/components/GuestForm";
 import Footer from "~/components/Footer";
 import { NextSeo } from "next-seo";
 
+// For Web scrapping
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { fetchRSS } from '../utils/rssParser';
+
+
 const Home: NextPage = () => {
+
+  const [summary, setSummary] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/summarize');
+        setSummary(response.data.summary);
+      } catch (error) {
+        console.error('Error:', error.response.data.error);
+        setSummary('');
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   return (
     <>
       <Head>
@@ -31,12 +55,27 @@ const Home: NextPage = () => {
             <Events/>
             <GuestForm/>
           </div>
-           
+          <div>
+          {summary && (
+            <div>
+              <h1>Article Summary</h1>
+              <p>{summary}</p>
+            </div>
+            )}
+          </div>
           <Footer/>
         </div>
+        
+      
+
       </main>
+        
     </>
   );
 };
 
+
+
+
 export default Home;
+
